@@ -1,0 +1,28 @@
+uuid: ff7f0bb3-f537-4695-8fa9-9913951d9caf
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.user.field_redirect_to_landing_page
+  module:
+    - user
+    - landing_page_scheduler
+  enforced:
+    module:
+      - landing_page_scheduler
+id: user.user.field_redirect_to_landing_page
+field_name: field_redirect_to_landing_page
+entity_type: user
+bundle: user
+label: 'Redirect to Landing Page'
+description: ''
+required: false
+translatable: false
+default_value:
+  -
+    value: 0
+default_value_callback: ''
+settings:
+  on_label: 'On'
+  off_label: 'Off'
+field_type: boolean

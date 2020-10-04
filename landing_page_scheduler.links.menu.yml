@@ -1,0 +1,7 @@
+landing_page_scheduler.admin_form:
+  route_name: landing_page_scheduler.admin_form
+  title: 'Landing Page Scheduler Helper'
+  description: 'Enables redirects to a landing page for a limited time'
+  parent: system.admin_config_system
+  weight: 10
+

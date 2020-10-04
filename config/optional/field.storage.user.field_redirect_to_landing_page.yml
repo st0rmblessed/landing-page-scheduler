@@ -1,0 +1,22 @@
+uuid: ff2df6e1-5443-4c1a-92ad-49477f097d97
+langcode: en
+status: true
+dependencies:
+  module:
+    - user
+    - landing_page_scheduler
+  enforced:
+    module:
+      - landing_page_scheduler
+id: user.field_redirect_to_landing_page
+field_name: field_redirect_to_landing_page
+entity_type: user
+type: boolean
+settings: {  }
+module: core
+locked: false
+cardinality: 1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

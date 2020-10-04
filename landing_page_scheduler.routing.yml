@@ -1,0 +1,7 @@
+landing_page_scheduler.admin_form:
+  path: '/admin/config/system/landing-page-scheduler'
+  defaults:
+    _form: '\Drupal\landing_page_scheduler\Form\LandingPageSchedulerForm'
+    _title: 'Landing Page Scheduler Helper'
+  requirements:
+    _permission: 'access landing page scheduler config page'

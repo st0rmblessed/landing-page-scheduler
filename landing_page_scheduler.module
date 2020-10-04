@@ -1,0 +1,121 @@
+<?php
+
+/**
+ * @file
+ * Landing Page Scheduler module file.
+ */
+
+use Drupal\Core\Url;
+use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\Core\Form\FormStateInterface;
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ */
+function landing_page_scheduler_form_user_login_form_alter(&$form, FormStateInterface $form_state) {
+  $form['#submit'][] = 'landing_page_scheduler_user_login_submit';
+}
+
+/**
+ * Form submission handler for user_login_form().
+ *
+ * Redirects the user to the configured node after logging in.
+ */
+function landing_page_scheduler_user_login_submit(&$form, FormStateInterface $form_state) {
+  // Gets form cofig.
+  $data = \Drupal::state()->get('landing_page_scheduler_config');
+  if (is_null($data)) {
+    return;
+  }
+  else {
+
+    // Get date values in unix format.
+    $start_date = $data['start']->getTimestamp();
+    $end_date = $data['end']->getTimestamp();
+    $current_date = time();
+
+    // To know if the redirect should only be done once per user.
+    $only_on_first_access = $data['first_access'];
+
+    // Get node id.
+    $nid = (int) $data['node'];
+
+    if ($current_date >= $start_date && $current_date <= $end_date) {
+      // Get user info.
+      $username = $form_state->getValue('name');
+      $user = user_load_by_name($username);
+      $user_id = (int) $user->id();
+      // Checks if user is already in db table.
+      $has_user = \Drupal::database()->select('user__field_redirect_to_landing_page')->condition('entity_id', $user_id)->countQuery()->execute()->fetchField();
+
+      if ($has_user === '0') {
+        // The user is not yet in the db tabl.
+        $user->set('field_redirect_to_landing_page', TRUE);
+        $user->save();
+        // Sets the value to false do only redirect once.
+        if ($only_on_first_access) {
+          $user->set('field_redirect_to_landing_page', FALSE);
+          $user->save();
+        }
+        doRedirect($nid, $form_state);
+      }
+      else {
+        // The user is already in the db table.
+        if ($user->field_redirect_to_landing_page->value) {
+          // Sets the value to false do only redirect once.
+          if ($only_on_first_access) {
+            $user->set('field_redirect_to_landing_page', FALSE);
+            $user->save();
+          }
+          doRedirect($nid, $form_state);
+        }
+        return;
+      }
+    }
+    elseif ($current_date > $end_date) {
+      // Clear value if the user never logged in inside the redirect window.
+      $username = $form_state->getValue('name');
+      $user = user_load_by_name($username);
+      $user->set('field_redirect_to_landing_page', FALSE);
+      $user->save();
+    }
+    else {
+      return;
+    }
+  }
+}
+
+/**
+ *
+ */
+function doRedirect($nid, $form_state) {
+  $url = Url::fromRoute('entity.node.canonical', ['node' => $nid]);
+  $request = \Drupal::service('request_stack')->getCurrentRequest();
+  if (!$request->request->has('destination')) {
+    $form_state->setRedirectUrl($url);
+  }
+  else {
+    $request->query->set('destination', $request->request->get('destination'));
+  }
+}
+
+/**
+ * Implements hook_help().
+ */
+function landing_page_scheduler_help($route_name, RouteMatchInterface $route_match) {
+  switch ($route_name) {
+    case 'help.page.landing_page_scheduler':
+      $output = '';
+      $output .= '<h2>' . t('About') . '</h2>';
+      $output .= '<p>' . t('Landing Page Scheduler is a module that allows the redirect of the users to a certain node for a limited period of time.')
+      . '</p>';
+      $output .= '<p>' . t('The module has a configuration page where one can configure the node to which the users should be redirected as well as the time window during
+      the redirect should occur.')
+          . '</p>';
+      $output .= '<h2>' . t('Uses') . '</h2>';
+      $output .= '<dl>';
+      $output .= '<dt>' . t('Limited time campaigns and other events that require a direct from the usual homepage.') . '</dt>';
+      $output .= '</dl>';
+      return $output;
+  }
+}

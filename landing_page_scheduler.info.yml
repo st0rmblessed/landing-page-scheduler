@@ -1,0 +1,8 @@
+name: Landing page Scheduler
+description: "Provides a form to redirect users to a landing page for a limited time"
+type: module
+core: 8.x
+core_version_requirement: ^8 || ^9
+configure: landing_page_scheduler.admin_form
+
+
