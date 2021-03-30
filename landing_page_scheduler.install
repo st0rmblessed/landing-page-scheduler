@@ -2,20 +2,16 @@
 
 /**
  * @file
- * Install, update and uninstall functions for the Landing Page Scheduler Module.
+ * Delete table  and configs created on uninstall.
  */
 
 /**
  * Implements hook_uninstall().
  */
+function landing_page_scheduler_uninstall() {
 
-
- function landing_page_scheduler_uninstall() {
-
-  // Delete new field db table and delete state form config
+  // Delete new field db table and delete state form config.
   \Drupal::database()->delete('user__field_redirect_to_landing_page')->execute();
   \Drupal::state()->delete('landing_page_scheduler_config');
 
 }
-
-

@@ -57,7 +57,7 @@ function landing_page_scheduler_user_login_submit(&$form, FormStateInterface $fo
           $user->set('field_redirect_to_landing_page', FALSE);
           $user->save();
         }
-        doRedirect($nid, $form_state);
+        do_redirect($nid, $form_state);
       }
       else {
         // The user is already in the db table.
@@ -67,7 +67,7 @@ function landing_page_scheduler_user_login_submit(&$form, FormStateInterface $fo
             $user->set('field_redirect_to_landing_page', FALSE);
             $user->save();
           }
-          doRedirect($nid, $form_state);
+          do_redirect($nid, $form_state);
         }
         return;
       }
@@ -86,9 +86,9 @@ function landing_page_scheduler_user_login_submit(&$form, FormStateInterface $fo
 }
 
 /**
- *
+ * Redirects the user to the predefined node.
  */
-function doRedirect($nid, $form_state) {
+function do_redirect($nid, $form_state) {
   $url = Url::fromRoute('entity.node.canonical', ['node' => $nid]);
   $request = \Drupal::service('request_stack')->getCurrentRequest();
   if (!$request->request->has('destination')) {

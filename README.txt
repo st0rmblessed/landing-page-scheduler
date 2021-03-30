@@ -11,8 +11,9 @@ CONTENTS OF THIS FILE
 INTRODUCTION
 ------------
 
-The Landing Page Scheduler (landing_page_scheduler) module provides a simple way for content managers to redirect
-their users to a certain page for a limited time. The module provices a configuration page where the page and the time
+The Landing Page Scheduler (landing_page_scheduler) module provides a simple way
+for content managers to redirect their users to a certain page for a limited
+time. The module provices a configuration page where the page and the time
 window can be configured.
 
 

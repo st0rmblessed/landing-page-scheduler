@@ -8,9 +8,10 @@ use Drupal\Core\State\StateInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Database\Connection;
 
 /**
- * LandingPageSchedulerForm form.
+ * Extends FormBase with the LandingPageSchedulerForm options.
  */
 class LandingPageSchedulerForm extends FormBase {
 
@@ -36,6 +37,13 @@ class LandingPageSchedulerForm extends FormBase {
   protected $entityTypeManager;
 
   /**
+   * The database connection.
+   *
+   * @var \Drupal\Core\Database\Connection
+   */
+  protected $connection;
+
+  /**
    * ReportWorkerBase constructor.
    *
    * @param \Drupal\Core\State\StateInterface $state
@@ -44,11 +52,14 @@ class LandingPageSchedulerForm extends FormBase {
    *   Provides an interface for an entity field manager.
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   Provides an interface for entity type managers.
+   * @param \Drupal\Core\Database\Connection $connection
+   *   The database connection.
    */
-  public function __construct(StateInterface $state, EntityFieldManagerInterface $entity_field_manager, EntityTypeManagerInterface $entity_type_manager) {
+  public function __construct(StateInterface $state, EntityFieldManagerInterface $entity_field_manager, EntityTypeManagerInterface $entity_type_manager, Connection $connection) {
     $this->state = $state;
     $this->entityFieldManager = $entity_field_manager;
     $this->entityTypeManager = $entity_type_manager;
+    $this->connection = $connection;
   }
 
   /**
@@ -58,7 +69,8 @@ class LandingPageSchedulerForm extends FormBase {
     return new static(
           $container->get('state'),
           $container->get('entity_field.manager'),
-          $container->get('entity_type.manager')
+          $container->get('entity_type.manager'),
+          $container->get('database')
       );
   }
 
@@ -79,7 +91,7 @@ class LandingPageSchedulerForm extends FormBase {
     // Load previously saved config.
     if (!is_null($data)) {
       $landing_page_scheduler_configs = $data;
-      $default_node = \Drupal::entityTypeManager()->getStorage('node')->load($data['node']);
+      $default_node = $this->entityTypeManager->getStorage('node')->load($data['node']);
     }
 
     // Build form.
@@ -166,7 +178,7 @@ class LandingPageSchedulerForm extends FormBase {
     }
 
     // Save field value in database.
-    \Drupal::database()->update('user__field_redirect_to_landing_page')->fields([
+    $this->connection->update('user__field_redirect_to_landing_page')->fields([
       'field_redirect_to_landing_page_value' => TRUE,
     ])->execute();
 
